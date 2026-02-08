@@ -238,16 +238,17 @@ db.users.updateOne(
 ### 2. Deploy Backend to Vercel
 1. Create a new Vercel project with root directory `backend`.
 2. Add environment variables:
-   - `MONGO_URI=<your-atlas-uri>`
-   - `JWT_SECRET=<your-secret>`
-   - `CLIENT_URL=https://<your-frontend>.vercel.app`
+   - `MONGO_URI=<mongodb://localhost:27017/electronics-store>`
+   - `JWT_SECRET=<8f4d9c2a1b7e6f3d0c9b8a7e6d5c4b3a2f1e0d9c8b7a6e5f4d3c2b1a0f9e8d7>
+`
+   - `CLIENT_URL=[https://<your-frontend>.vercel.app](https://github.com/flekshot/final-web)`
 3. Deploy and copy backend URL:
-   - `https://<your-backend>.vercel.app`
+   - `[https://<your-backend>.vercel.app](https://final-web-bc1f-flekshots-projects.vercel.app/)`
 
 ### 3. Deploy Frontend to Vercel
 1. Create another Vercel project with root directory `frontend`.
 2. Add environment variable:
-   - `VITE_API_URL=https://<your-backend>.vercel.app/api`
+   - `VITE_API_URL=http://localhost:5000/api`
 3. Deploy frontend.
 
 ### 4. Verify
@@ -256,19 +257,7 @@ db.users.updateOne(
 3. Open products, cart, checkout.
 4. Verify admin page with admin account.
 
-## Screenshots in README
 
-Put your screenshot files into `docs/screenshots/` with these names:
-- `docs/screenshots/home.png`
-- `docs/screenshots/login.png`
-- `docs/screenshots/products.png`
-- `docs/screenshots/product-detail.png`
-- `docs/screenshots/cart.png`
-- `docs/screenshots/checkout.png`
-- `docs/screenshots/orders.png`
-- `docs/screenshots/admin-products.png`
-
-Then add this section (or keep this one as-is):
 
 ## Screenshots
 
