@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema(
   {
@@ -26,6 +26,11 @@ const productSchema = new mongoose.Schema(
       required: [true, 'Product stock is required'],
       min: [0, 'Stock cannot be negative'],
       default: 0,
+    },
+    imageUrl: {
+      type: String,
+      trim: true,
+      default: '',
     },
   },
   {

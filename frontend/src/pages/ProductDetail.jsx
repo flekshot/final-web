@@ -1,13 +1,14 @@
-import { useState, useEffect, useContext } from 'react';
+﻿import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import api from '../api/axios';
+import { getProductImage, getFallbackProductImage } from '../utils/productImage';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
-  
+
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ const ProductDetail = () => {
       setError('Not enough stock available');
       return;
     }
-    
+
     addToCart(product, quantity);
     setSuccess('Added to cart!');
     setTimeout(() => setSuccess(''), 3000);
@@ -48,20 +49,28 @@ const ProductDetail = () => {
   return (
     <div className="product-detail-page">
       <button onClick={() => navigate('/products')} className="btn btn-secondary">
-        ← Back to Products
+        Back to Products
       </button>
-      
+
       <div className="product-detail">
         <div className="product-info">
+          <img
+            className="product-image product-image-detail"
+            src={getProductImage(product)}
+            alt={product.name}
+            onError={(e) => {
+              e.currentTarget.src = getFallbackProductImage();
+            }}
+          />
           <h1>{product.name}</h1>
           <p className="category">Category: {product.category}</p>
           <p className="description">{product.description}</p>
-          <p className="price">${product.price.toFixed(2)}</p>
+          <p className="price">${Number(product.price).toFixed(2)}</p>
           <p className="stock">Available Stock: {product.stock}</p>
-          
+
           {success && <div className="success-message">{success}</div>}
           {error && <div className="error-message">{error}</div>}
-          
+
           <div className="add-to-cart">
             <div className="quantity-selector">
               <label htmlFor="quantity">Quantity:</label>
@@ -71,10 +80,10 @@ const ProductDetail = () => {
                 min="1"
                 max={product.stock}
                 value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value))}
+                onChange={(e) => setQuantity(parseInt(e.target.value, 10) || 1)}
               />
             </div>
-            
+
             <button
               onClick={handleAddToCart}
               className="btn btn-primary"

@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
+import { getProductImage, getFallbackProductImage } from '../utils/productImage';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -22,7 +23,7 @@ const Products = () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      
+
       if (filters.search) params.append('search', filters.search);
       if (filters.category) params.append('category', filters.category);
       if (filters.minPrice) params.append('minPrice', filters.minPrice);
@@ -67,7 +68,7 @@ const Products = () => {
   const getShortText = (text, maxLen = 110) => {
     if (!text) return '';
     if (text.length <= maxLen) return text;
-    return `${text.slice(0, maxLen).trim()}…`;
+    return `${text.slice(0, maxLen).trim()}...`;
   };
 
   if (loading) return <div className="loading">Loading products...</div>;
@@ -75,7 +76,7 @@ const Products = () => {
   return (
     <div className="products-page">
       <h1>Products</h1>
-      
+
       <div className="filters">
         <form onSubmit={handleSearch} className="filter-form">
           <input
@@ -85,7 +86,7 @@ const Products = () => {
             value={filters.search}
             onChange={handleFilterChange}
           />
-          
+
           <input
             type="text"
             name="category"
@@ -93,7 +94,7 @@ const Products = () => {
             value={filters.category}
             onChange={handleFilterChange}
           />
-          
+
           <input
             type="number"
             name="minPrice"
@@ -101,7 +102,7 @@ const Products = () => {
             value={filters.minPrice}
             onChange={handleFilterChange}
           />
-          
+
           <input
             type="number"
             name="maxPrice"
@@ -109,8 +110,10 @@ const Products = () => {
             value={filters.maxPrice}
             onChange={handleFilterChange}
           />
-          
-          <button type="submit" className="btn btn-primary">Search</button>
+
+          <button type="submit" className="btn btn-primary">
+            Search
+          </button>
           <button type="button" onClick={clearFilters} className="btn btn-secondary">
             Clear
           </button>
@@ -125,10 +128,18 @@ const Products = () => {
         ) : (
           products.map((product) => (
             <div key={product._id} className="product-card">
+              <img
+                className="product-image"
+                src={getProductImage(product)}
+                alt={product.name}
+                onError={(e) => {
+                  e.currentTarget.src = getFallbackProductImage();
+                }}
+              />
               <h3>{product.name}</h3>
               <p className="category">{product.category}</p>
               <p className="desc">{getShortText(product.description)}</p>
-              <p className="price">${product.price.toFixed(2)}</p>
+              <p className="price">${Number(product.price).toFixed(2)}</p>
               <p className="stock">Stock: {product.stock}</p>
               <div className="card-actions">
                 <button
@@ -153,13 +164,21 @@ const Products = () => {
             <div className="modal-header">
               <h2 className="modal-title">{quickViewProduct.name}</h2>
               <button type="button" className="modal-close" onClick={closeQuickView}>
-                ✕
+                x
               </button>
             </div>
             <div className="modal-body">
+              <img
+                className="product-image product-image-modal"
+                src={getProductImage(quickViewProduct)}
+                alt={quickViewProduct.name}
+                onError={(e) => {
+                  e.currentTarget.src = getFallbackProductImage();
+                }}
+              />
               <p className="category">Category: {quickViewProduct.category}</p>
               <p className="desc">{quickViewProduct.description}</p>
-              <p className="price">${quickViewProduct.price.toFixed(2)}</p>
+              <p className="price">${Number(quickViewProduct.price).toFixed(2)}</p>
               <p className="stock">Stock: {quickViewProduct.stock}</p>
             </div>
             <div className="modal-actions">

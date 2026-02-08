@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+﻿import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
 import AdminProducts from './pages/AdminProducts';
+import AdminEditProduct from './pages/AdminEditProduct';
 
 function App() {
   return (
@@ -67,6 +68,14 @@ function App() {
                   element={
                     <ProtectedRoute adminOnly={true}>
                       <AdminProducts />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/products/:id/edit"
+                  element={
+                    <ProtectedRoute adminOnly={true}>
+                      <AdminEditProduct />
                     </ProtectedRoute>
                   }
                 />

@@ -1,20 +1,24 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api/axios';
+import { getProductImage, getFallbackProductImage } from '../utils/productImage';
+
+const initialFormData = {
+  name: '',
+  description: '',
+  price: '',
+  category: '',
+  stock: '',
+  imageUrl: '',
+};
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [editingProduct, setEditingProduct] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: '',
-    stock: '',
-  });
+  const [formData, setFormData] = useState(initialFormData);
 
   useEffect(() => {
     fetchProducts();
@@ -37,14 +41,7 @@ const AdminProducts = () => {
   };
 
   const resetForm = () => {
-    setFormData({
-      name: '',
-      description: '',
-      price: '',
-      category: '',
-      stock: '',
-    });
-    setEditingProduct(null);
+    setFormData(initialFormData);
     setShowForm(false);
   };
 
@@ -54,39 +51,17 @@ const AdminProducts = () => {
     setSuccess('');
 
     try {
-      await api.post('/products', formData);
+      await api.post('/products', {
+        ...formData,
+        price: Number(formData.price),
+        stock: Number(formData.stock),
+      });
       setSuccess('Product created successfully');
-      fetchProducts();
+      await fetchProducts();
       resetForm();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create product');
-    }
-  };
-
-  const handleEdit = (product) => {
-    setEditingProduct(product._id);
-    setFormData({
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      category: product.category,
-      stock: product.stock,
-    });
-    setShowForm(true);
-  };
-
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    try {
-      await api.put(`/products/${editingProduct}`, formData);
-      setSuccess('Product updated successfully');
-      fetchProducts();
-      resetForm();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update product');
+      const validationMessage = err.response?.data?.errors?.[0];
+      setError(validationMessage || err.response?.data?.message || 'Failed to create product');
     }
   };
 
@@ -96,9 +71,11 @@ const AdminProducts = () => {
     }
 
     try {
+      setError('');
+      setSuccess('');
       await api.delete(`/products/${id}`);
       setSuccess('Product deleted successfully');
-      fetchProducts();
+      await fetchProducts();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete product');
     }
@@ -107,24 +84,18 @@ const AdminProducts = () => {
   return (
     <div className="admin-products-page">
       <h1>Product Management</h1>
-      
+
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
-      
-      <button
-        onClick={() => setShowForm(!showForm)}
-        className="btn btn-primary"
-      >
+
+      <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
         {showForm ? 'Cancel' : 'Add New Product'}
       </button>
-      
+
       {showForm && (
-        <form
-          onSubmit={editingProduct ? handleUpdate : handleCreate}
-          className="product-form"
-        >
-          <h2>{editingProduct ? 'Edit Product' : 'Create New Product'}</h2>
-          
+        <form onSubmit={handleCreate} className="product-form">
+          <h2>Create New Product</h2>
+
           <div className="form-group">
             <label htmlFor="name">Name</label>
             <input
@@ -136,7 +107,7 @@ const AdminProducts = () => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="description">Description</label>
             <textarea
@@ -147,7 +118,19 @@ const AdminProducts = () => {
               required
             />
           </div>
-          
+
+          <div className="form-group">
+            <label htmlFor="imageUrl">Image URL</label>
+            <input
+              type="url"
+              id="imageUrl"
+              name="imageUrl"
+              value={formData.imageUrl}
+              onChange={handleInputChange}
+              placeholder="https://..."
+            />
+          </div>
+
           <div className="form-group">
             <label htmlFor="price">Price</label>
             <input
@@ -155,12 +138,13 @@ const AdminProducts = () => {
               id="price"
               name="price"
               step="0.01"
+              min="0"
               value={formData.price}
               onChange={handleInputChange}
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="category">Category</label>
             <input
@@ -172,22 +156,23 @@ const AdminProducts = () => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="stock">Stock</label>
             <input
               type="number"
               id="stock"
               name="stock"
+              min="0"
               value={formData.stock}
               onChange={handleInputChange}
               required
             />
           </div>
-          
+
           <div className="form-actions">
             <button type="submit" className="btn btn-primary">
-              {editingProduct ? 'Update' : 'Create'}
+              Create
             </button>
             <button type="button" onClick={resetForm} className="btn btn-secondary">
               Cancel
@@ -195,7 +180,7 @@ const AdminProducts = () => {
           </div>
         </form>
       )}
-      
+
       <div className="products-table">
         <h2>All Products</h2>
         {loading ? (
@@ -204,6 +189,7 @@ const AdminProducts = () => {
           <table>
             <thead>
               <tr>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Category</th>
                 <th>Price</th>
@@ -214,17 +200,24 @@ const AdminProducts = () => {
             <tbody>
               {products.map((product) => (
                 <tr key={product._id}>
+                  <td>
+                    <img
+                      className="admin-product-thumb"
+                      src={getProductImage(product)}
+                      alt={product.name}
+                      onError={(e) => {
+                        e.currentTarget.src = getFallbackProductImage();
+                      }}
+                    />
+                  </td>
                   <td>{product.name}</td>
                   <td>{product.category}</td>
-                  <td>${product.price.toFixed(2)}</td>
+                  <td>${Number(product.price).toFixed(2)}</td>
                   <td>{product.stock}</td>
-                  <td>
-                    <button
-                      onClick={() => handleEdit(product)}
-                      className="btn btn-small btn-primary"
-                    >
+                  <td className="admin-actions">
+                    <Link to={`/admin/products/${product._id}/edit`} className="btn btn-small btn-primary">
                       Edit
-                    </button>
+                    </Link>
                     <button
                       onClick={() => handleDelete(product._id)}
                       className="btn btn-small btn-danger"

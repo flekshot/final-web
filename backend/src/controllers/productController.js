@@ -1,25 +1,25 @@
-const Product = require('../models/Product');
+﻿const Product = require('../models/Product');
 const { validationResult } = require('express-validator');
 
 // Get all products with filters
 const getProducts = async (req, res, next) => {
   try {
     const { search, category, minPrice, maxPrice } = req.query;
-    
+
     // Build query
-    let query = {};
-    
+    const query = {};
+
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
       ];
     }
-    
+
     if (category) {
       query.category = { $regex: category, $options: 'i' };
     }
-    
+
     if (minPrice || maxPrice) {
       query.price = {};
       if (minPrice) query.price.$gte = Number(minPrice);
@@ -70,7 +70,7 @@ const createProduct = async (req, res, next) => {
       });
     }
 
-    const { name, description, price, category, stock } = req.body;
+    const { name, description, price, category, stock, imageUrl } = req.body;
 
     const product = await Product.create({
       name,
@@ -78,6 +78,7 @@ const createProduct = async (req, res, next) => {
       price,
       category,
       stock,
+      imageUrl: imageUrl || '',
     });
 
     res.status(201).json({
@@ -92,7 +93,7 @@ const createProduct = async (req, res, next) => {
 // Update product (admin only)
 const updateProduct = async (req, res, next) => {
   try {
-    const { name, description, price, category, stock } = req.body;
+    const { name, description, price, category, stock, imageUrl } = req.body;
 
     const product = await Product.findById(req.params.id);
 
@@ -109,6 +110,7 @@ const updateProduct = async (req, res, next) => {
     if (price !== undefined) product.price = price;
     if (category !== undefined) product.category = category;
     if (stock !== undefined) product.stock = stock;
+    if (imageUrl !== undefined) product.imageUrl = imageUrl;
 
     await product.save();
 

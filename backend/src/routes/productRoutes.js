@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const { body } = require('express-validator');
 const {
   getProducts,
@@ -28,6 +28,11 @@ router.post(
     body('price').isNumeric().withMessage('Price must be a number'),
     body('category').trim().notEmpty().withMessage('Category is required'),
     body('stock').isNumeric().withMessage('Stock must be a number'),
+    body('imageUrl')
+      .optional({ values: 'falsy' })
+      .trim()
+      .isURL()
+      .withMessage('Image URL must be a valid URL'),
   ],
   createProduct
 );

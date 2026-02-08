@@ -11,7 +11,11 @@ const orderRoutes = require('./routes/orderRoutes');
 const app = express();
 
 // Middleware
-app.use(cors());
+const corsOptions = process.env.CLIENT_URL
+  ? { origin: process.env.CLIENT_URL }
+  : undefined;
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

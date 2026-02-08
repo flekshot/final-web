@@ -148,7 +148,7 @@ npm install
 npm run dev
 ```
 
-The frontend will run on `http://localhost:3000`
+The frontend will run on `http://localhost:5173`
 
 ## API Endpoints
 
@@ -225,6 +225,75 @@ db.users.updateOne(
 
 ### Port Conflicts
 - If port 5000 or 3000 is already in use, update the port in `.env` (backend) or `vite.config.js` (frontend)
+
+## Deployment (Vercel + Atlas)
+
+### 1. Prepare MongoDB Atlas
+1. Create a cluster in MongoDB Atlas.
+2. Create a database user.
+3. In `Network Access`, allow your deploy environment IP (for quick setup you can use `0.0.0.0/0`).
+4. Copy your Atlas connection string to `MONGO_URI`.
+
+### 2. Deploy Backend to Vercel
+1. Create a new Vercel project with root directory `backend`.
+2. Add environment variables:
+   - `MONGO_URI=<your-atlas-uri>`
+   - `JWT_SECRET=<your-secret>`
+   - `CLIENT_URL=https://<your-frontend>.vercel.app`
+3. Deploy and copy backend URL:
+   - `https://<your-backend>.vercel.app`
+
+### 3. Deploy Frontend to Vercel
+1. Create another Vercel project with root directory `frontend`.
+2. Add environment variable:
+   - `VITE_API_URL=https://<your-backend>.vercel.app/api`
+3. Deploy frontend.
+
+### 4. Verify
+1. Open frontend URL.
+2. Register/login.
+3. Open products, cart, checkout.
+4. Verify admin page with admin account.
+
+## Screenshots in README
+
+Put your screenshot files into `docs/screenshots/` with these names:
+- `docs/screenshots/home.png`
+- `docs/screenshots/login.png`
+- `docs/screenshots/products.png`
+- `docs/screenshots/product-detail.png`
+- `docs/screenshots/cart.png`
+- `docs/screenshots/checkout.png`
+- `docs/screenshots/orders.png`
+- `docs/screenshots/admin-products.png`
+
+Then add this section (or keep this one as-is):
+
+## Screenshots
+
+### Home Page
+![Home Page](docs/screenshots/home.png)
+
+### Login Page
+![Login Page](docs/screenshots/login.png)
+
+### Products Page
+![Products Page](docs/screenshots/products.png)
+
+### Product Detail
+![Product Detail](docs/screenshots/product-detail.png)
+
+### Cart Page
+![Cart Page](docs/screenshots/cart.png)
+
+### Checkout Page
+![Checkout Page](docs/screenshots/checkout.png)
+
+### Orders Page
+![Orders Page](docs/screenshots/orders.png)
+
+### Admin Products
+![Admin Products](docs/screenshots/admin-products.png)
 
 ## License
 
