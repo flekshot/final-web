@@ -287,14 +287,7 @@ Then add this section (or keep this one as-is):
 ### Cart Page
 ![Cart Page](docs/screenshots/cart.png)
 
-### Checkout Page
-![Checkout Page](docs/screenshots/checkout.png)
 
-### Orders Page
-![Orders Page](docs/screenshots/orders.png)
-
-### Admin Products
-![Admin Products](docs/screenshots/admin-products.png)
 
 ## License
 
