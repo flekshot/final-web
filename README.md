@@ -1,7 +1,7 @@
 # Electronics Store Website
 
 A full-stack e-commerce application for electronics built with React, Node.js, Express, and MongoDB.
-![Uploading изображение.png…]()
+
 
 ## Features
 
